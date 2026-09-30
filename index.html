@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>设变数据看板 · 选择区域</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body{
+    font-family:"Microsoft YaHei","PingFang SC",sans-serif;
+    background:#f5f7fa; color:#303133;
+    padding:20px;
+  }
+  .header{
+    margin-bottom:20px;
+  }
+  .header h1{
+    font-size:24px; font-weight:700; color:#1f2937; letter-spacing:1px;
+  }
+  .header p{
+    font-size:13px; color:#6b7280; margin-top:6px;
+  }
+
+  .card{
+    background:#fff; border-radius:8px; box-shadow:0 1px 3px rgba(0,0,0,.08);
+    overflow:hidden;
+  }
+  .card-header{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:14px 20px;
+    border-bottom:1px solid #e5e7eb;
+  }
+  .card-header h2{
+    font-size:16px; font-weight:600; color:#1f2937;
+  }
+  .btn{
+    padding:6px 16px; font-size:13px; border-radius:4px;
+    cursor:pointer; border:1px solid #d1d5db; background:#fff; color:#374151;
+    transition:all .15s;
+  }
+  .btn:hover{ border-color:#409eff; color:#409eff; }
+  .btn-primary{
+    background:#409eff; border-color:#409eff; color:#fff;
+  }
+  .btn-primary:hover{ background:#66b1ff; border-color:#66b1ff; color:#fff; }
+
+  .region-table{
+    width:100%; border-collapse:collapse;
+  }
+  .region-table th{
+    text-align:left; padding:10px 20px;
+    background:#fafafa; color:#6b7280; font-weight:600; font-size:13px;
+    border-bottom:1px solid #e5e7eb;
+  }
+  .region-table th:first-child{
+    width:50px;
+  }
+  .region-table td{
+    padding:12px 20px; border-bottom:1px solid #f0f0f0;
+    font-size:14px;
+  }
+  .region-table tbody tr{
+    cursor:pointer; transition:background .15s;
+  }
+  .region-table tbody tr:hover{
+    background:#f5f7fa;
+  }
+  .region-table input[type=checkbox]{
+    width:16px; height:16px; cursor:pointer;
+    accent-color:#409eff;
+  }
+  .region-name{
+    font-weight:500; color:#1f2937;
+  }
+  .region-desc{
+    font-size:12px; color:#9ca3af; margin-top:2px;
+  }
+
+  /* Modal */
+  .modal-overlay{
+    position:fixed; inset:0; background:rgba(0,0,0,.5);
+    display:none; align-items:center; justify-content:center;
+    z-index:100;
+  }
+  .modal-overlay.active{ display:flex; }
+  .modal{
+    background:#fff; border-radius:8px; width:100%; max-width:360px;
+    box-shadow:0 8px 24px rgba(0,0,0,.15);
+    overflow:hidden;
+  }
+  .modal-header{
+    padding:14px 20px; border-bottom:1px solid #e5e7eb;
+    font-size:15px; font-weight:600; color:#1f2937;
+  }
+  .modal-body{
+    padding:12px 0;
+  }
+  .dash-option{
+    padding:12px 20px; cursor:pointer; transition:background .15s;
+  }
+  .dash-option:hover{ background:#f5f7fa; }
+  .dash-option .name{ font-size:14px; font-weight:500; color:#1f2937; }
+  .dash-option .desc{ font-size:12px; color:#9ca3af; margin-top:2px; }
+  .modal-footer{
+    padding:10px 20px; border-top:1px solid #e5e7eb;
+    display:flex; justify-content:flex-end; gap:8px;
+  }
+  .btn-text{
+    border:none; background:transparent; color:#6b7280;
+    cursor:pointer; font-size:13px; padding:6px 12px;
+  }
+  .btn-text:hover{ color:#409eff; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>设变数据看板</h1>
+  <p>请选择要查看的区域，生成对应看板</p>
+</div>
+
+<div class="card">
+  <div class="card-header">
+    <h2>选择区域</h2>
+    <button class="btn btn-primary" id="generateBtn">生成看板</button>
+  </div>
+  <table class="region-table">
+    <thead>
+      <tr>
+        <th><input type="checkbox" id="checkAll"></th>
+        <th>区域名称</th>
+        <th style="width:40%;">说明</th>
+      </tr>
+    </thead>
+    <tbody id="regionTbody">
+      
+        <tr data-region="电装">
+          <td><input type="checkbox" class="region-checkbox" value="电装"></td>
+          <td><span class="region-name">电装</span></td>
+          <td><span class="region-desc">查看电装区域的设变数据</span></td>
+        </tr>
+      
+        <tr data-region="内装">
+          <td><input type="checkbox" class="region-checkbox" value="内装"></td>
+          <td><span class="region-name">内装</span></td>
+          <td><span class="region-desc">查看内装区域的设变数据</span></td>
+        </tr>
+      
+        <tr data-region="外装">
+          <td><input type="checkbox" class="region-checkbox" value="外装"></td>
+          <td><span class="region-name">外装</span></td>
+          <td><span class="region-desc">查看外装区域的设变数据</span></td>
+        </tr>
+      
+        <tr data-region="仪表">
+          <td><input type="checkbox" class="region-checkbox" value="仪表"></td>
+          <td><span class="region-name">仪表</span></td>
+          <td><span class="region-desc">查看仪表区域的设变数据</span></td>
+        </tr>
+      
+        <tr data-region="车门">
+          <td><input type="checkbox" class="region-checkbox" value="车门"></td>
+          <td><span class="region-name">车门</span></td>
+          <td><span class="region-desc">查看车门区域的设变数据</span></td>
+        </tr>
+      
+        <tr data-region="底盘">
+          <td><input type="checkbox" class="region-checkbox" value="底盘"></td>
+          <td><span class="region-name">底盘</span></td>
+          <td><span class="region-desc">查看底盘区域的设变数据</span></td>
+        </tr>
+      
+    </tbody>
+  </table>
+</div>
+
+<!-- Modal -->
+<div class="modal-overlay" id="modal">
+  <div class="modal">
+    <div class="modal-header">选择看板类型</div>
+    <div class="modal-body">
+      <div class="dash-option" data-type="dashboard">
+        <div class="name">设变数据看板</div>
+        <div class="desc">KPI概览 + 设变明细清单</div>
+      </div>
+      <div class="dash-option" data-type="flow">
+        <div class="name">设变流程工序</div>
+        <div class="desc">流程矩阵 + 时间范围滑块</div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-text" id="cancelBtn">取消</button>
+    </div>
+  </div>
+</div>
+
+<script>
+var checkAll = document.getElementById('checkAll');
+var generateBtn = document.getElementById('generateBtn');
+var modal = document.getElementById('modal');
+var cancelBtn = document.getElementById('cancelBtn');
+var checkboxes = document.querySelectorAll('.region-checkbox');
+
+// 行点击切换选中
+document.querySelectorAll('#regionTbody tr').forEach(function(tr){
+  tr.addEventListener('click', function(e){
+    if(e.target.type === 'checkbox') return;
+    var cb = tr.querySelector('input[type=checkbox]');
+    cb.checked = !cb.checked;
+    updateCheckAll();
+  });
+});
+
+// 全选复选框
+checkAll.addEventListener('change', function(){
+  var checked = checkAll.checked;
+  checkboxes.forEach(function(cb){ cb.checked = checked; });
+});
+
+// 单个复选框变化时更新全选状态
+checkboxes.forEach(function(cb){
+  cb.addEventListener('change', function(){
+    updateCheckAll();
+  });
+});
+
+function updateCheckAll(){
+  var total = checkboxes.length;
+  var checked = document.querySelectorAll('.region-checkbox:checked').length;
+  checkAll.checked = checked === total;
+  checkAll.indeterminate = checked > 0 && checked < total;
+}
+
+// 默认全不选
+updateCheckAll();
+
+// 生成看板按钮
+generateBtn.addEventListener('click', function(){
+  modal.classList.add('active');
+});
+
+cancelBtn.addEventListener('click', function(){
+  modal.classList.remove('active');
+});
+
+modal.addEventListener('click', function(e){
+  if(e.target === modal) modal.classList.remove('active');
+});
+
+document.querySelectorAll('.dash-option').forEach(function(opt){
+  opt.addEventListener('click', function(){
+    var type = opt.getAttribute('data-type');
+    var selected = [];
+    checkboxes.forEach(function(cb){
+      if(cb.checked) selected.push(cb.value);
+    });
+    // 全选或全不选都不传参数（表示全部区域）
+    var total = checkboxes.length;
+    var url = type + '.html';
+    if(selected.length > 0 && selected.length < total){
+      url += '?regions=' + encodeURIComponent(selected.join(','));
+    }
+    window.location.href = url;
+  });
+});
+</script>
+
+</body></html>
